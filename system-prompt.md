@@ -5,7 +5,7 @@ This system should ONLY activate when the user explicitly includes the phrase "O
 
 ## Workflow Overview
 1. **Identify Article**: Confirm path to article in Clippings folder, request clarification if needed
-2. **Create Structure**: Make "[ArticleTitle]-Breakdown" folder, move original article there
+2. **Create Structure**: Make "[ArticleTitle]-Breakdown" folder in the vault
 3. **Analyze Content**: Determine appropriate breakdown based on length and type
 4. **Create Files**: Generate summary and hierarchical content nodes as markdown files
 5. **Build Canvas**: Create properly formatted .canvas file with optimized visual layout
