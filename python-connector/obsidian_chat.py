@@ -2,7 +2,8 @@ import os
 import sys
 import asyncio
 from pathlib import Path
-from autogen_ext.models.openai import OpenAIChatCompletionClient
+from dotenv import load_dotenv
+from autogen_ext.models.anthropic import AnthropicChatCompletionClient
 from autogen_ext.tools.mcp import StdioServerParams, mcp_server_tools
 from autogen_agentchat.agents import AssistantAgent
 from autogen_core import CancellationToken
@@ -14,9 +15,9 @@ class ObsidianChat:
         self.mcp_path = mcp_path
         self.agent = None
         
-        # Check for OpenAI API key
-        if not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("OPENAI_API_KEY environment variable not set")
+        # Check for Anthropic API key
+        if not os.getenv("ANTHROPIC_API_KEY"):
+            raise ValueError("ANTHROPIC_API_KEY environment variable not set")
 
     async def setup(self):
         """Set up the MCP server and create the agent"""
@@ -32,8 +33,12 @@ class ObsidianChat:
             tools = await mcp_server_tools(obsidian_mcp_server)
             print("MCP tools initialized successfully!")
             
+            # Get model from env variable
+            model_name = os.getenv("ANTHROPIC_MODEL", "claude-3-haiku-20240307") # Default if not set
+            print(f"Using model: {model_name}")
+            
             # Create the model client
-            model_client = OpenAIChatCompletionClient(model="gemini-1.5-flash")
+            model_client = AnthropicChatCompletionClient(model=model_name) # Use variable
             
             # Create the agent with access to the MCP tools
             self.agent = AssistantAgent(
@@ -147,9 +152,20 @@ Ask for confirmation before performing such operations.""",
             print("\nGoodbye!")
 
 async def main():
-    # Use the paths from your environment
-    vault_path = "/Users/keshavag/projects/break-down-vault"  # Update this
-    mcp_path = "/Users/keshavag/projects/obsidian-mcp/build/main.js"  # Update this
+    load_dotenv()
+    
+    # Get config from environment variables
+    vault_path = os.getenv("VAULT_PATH")
+    mcp_path = os.getenv("MCP_PATH")
+
+    # Check if paths are set
+    if not vault_path:
+        raise ValueError("VAULT_PATH environment variable not set")
+    if not mcp_path:
+        raise ValueError("MCP_PATH environment variable not set")
+
+    print(f"Vault Path: {vault_path}")
+    print(f"MCP Path: {mcp_path}")
     
     chat = ObsidianChat(vault_path, mcp_path)
     await chat.chat_loop()
