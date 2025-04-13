@@ -3,6 +3,7 @@ import sys
 import asyncio
 from pathlib import Path
 from autogen_ext.models.openai import OpenAIChatCompletionClient
+from autogen_ext.models.anthropic import AnthropicChatCompletionClient
 from autogen_ext.tools.mcp import StdioServerParams, mcp_server_tools
 from autogen_agentchat.agents import AssistantAgent
 from autogen_core import CancellationToken
@@ -33,7 +34,8 @@ class ObsidianChat:
             print("MCP tools initialized successfully!")
             
             # Create the model client
-            model_client = OpenAIChatCompletionClient(model="gemini-1.5-flash")
+            # model_client = OpenAIChatCompletionClient(model="gemini-1.5-flash")
+            model_client = AnthropicChatCompletionClient(model="claude-3-7-sonnet-20250219")
             
             # Create the agent with access to the MCP tools
             self.agent = AssistantAgent(
