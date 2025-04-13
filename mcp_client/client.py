@@ -85,10 +85,44 @@ async def run_client():
                      print("The handle_sampling_message callback might not be invoked.")
 
 
-                print("Client is running and connected to the server.")
-                print("Waiting for sampling requests from the server...")
+                print("Attempting to interact with the server...")
+
+                try:
+                    # Check if server reported tool capability before listing
+                    if server_capabilities and getattr(server_capabilities, 'tools', None):
+                        print("Listing tools...")
+                        tools = await session.list_tools()
+                        print(f"Available tools: {tools}")
+                    else:
+                        print("Server does not report tool capability.")
+                except Exception as e:
+                    print(f"Error listing tools: {e}")
+
+                try:
+                    # Check if server reported resource capability before listing
+                    if server_capabilities and getattr(server_capabilities, 'resources', None):
+                        print("Listing resources...")
+                        resources = await session.list_resources()
+                        print(f"Available resources: {resources}")
+                    else:
+                        print("Server does not report resource capability.")
+                except Exception as e:
+                    print(f"Error listing resources: {e}")
+
+                try:
+                    # Check if server reported prompt capability before listing
+                    if server_capabilities and getattr(server_capabilities, 'prompts', None):
+                        print("Listing prompts...")
+                        prompts = await session.list_prompts()
+                        print(f"Available prompts: {prompts}")
+                    else:
+                        print("Server does not report prompt capability.")
+                except Exception as e:
+                    print(f"Error listing prompts: {e}")
+
+                print("Interaction test finished.")
                 # Keep the client running to handle callbacks indefinitely
-                await asyncio.Future() # Wait forever
+                # await asyncio.Future() # Wait forever - REMOVED FOR TESTING
 
     except FileNotFoundError:
         print(f"Error: Server command not found: '{server_command}'")
