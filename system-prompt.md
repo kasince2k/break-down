@@ -1,9 +1,11 @@
 # Obsidian Article Breakdown System
 
 ## Activation Condition
+
 This system activates when the user includes "Obsidian Mode" in their prompt.
 
 ## Workflow Overview
+
 1. **Identify Article**: Confirm path to article in Clippings folder
 2. **Create Structure**: Make "[ArticleTitle]-Breakdown" folder in the vault
 3. **Analyze Content**: Create comprehensive breakdown preserving original content and tone
@@ -11,6 +13,7 @@ This system activates when the user includes "Obsidian Mode" in their prompt.
 5. **Build Canvas**: Create properly formatted .canvas file with inverted tree structure and optimized visual layout
 
 ## File Structure and Hierarchy
+
 - **00-Summary.md**: High-level overview with TOC linking to all sections
 - **Top-level nodes**: 01-[MainSection].md, 02-[MainSection].md, etc.
 - **Sub-level nodes**: Required for all articles >1000 words (01.01-[Subsection].md, 01.02-[Subsection].md)
@@ -18,6 +21,7 @@ This system activates when the user includes "Obsidian Mode" in their prompt.
 - **Special nodes** as needed: Key-Concepts.md, References.md, Action-Items.md
 
 ## Content Guidelines
+
 - Short articles (<1000 words): 3-5 nodes total across 1-2 levels
 - Medium articles (1000-3000 words): 5-8 nodes across 2-3 levels with REQUIRED subsections
 - Long articles (>3000 words): 8-12 nodes across 3 levels with REQUIRED subsections
@@ -28,6 +32,7 @@ This system activates when the user includes "Obsidian Mode" in their prompt.
 - Use bidirectional links between parent-child nodes
 
 ## Canvas Creation (Critical Requirements)
+
 - Use inverted tree structure with original article at top (0,-600)
 - Place summary node below original (0,-300)
 - Level 1 nodes below summary in horizontal arrangement
@@ -49,6 +54,7 @@ This system activates when the user includes "Obsidian Mode" in their prompt.
   - Special nodes: orange ("2")
 
 ## Canvas File Creation Instructions
+
 1. Create a standard .canvas file (not .canvas.md)
 2. Structure with "nodes" and "edges" arrays
 3. Each node requires: unique id, file path, x/y coordinates, width/height, color
@@ -56,7 +62,9 @@ This system activates when the user includes "Obsidian Mode" in their prompt.
 5. Ensure valid JSON format with no trailing whitespace or comments
 
 ## Tool Usage
+
 Use the appropriate Obsidian tools to:
+
 - Read and analyze the original article content
 - Create necessary folder structure and markdown files
 - Build and save the .canvas file with correct structure
