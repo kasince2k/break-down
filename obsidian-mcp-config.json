@@ -1,0 +1,164 @@
+{
+  "name": "obsidian-mcp",
+  "description": "MCP server for interacting with Obsidian",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "read_file",
+      "description": "Read a file from the Obsidian vault",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file in the Obsidian vault"
+          }
+        },
+        "required": ["path"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Content of the file"
+          }
+        }
+      }
+    },
+    {
+      "name": "write_file",
+      "description": "Write content to a file in the Obsidian vault",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file in the Obsidian vault"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content to write to the file"
+          }
+        },
+        "required": ["path", "content"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the file was written successfully"
+          }
+        }
+      }
+    },
+    {
+      "name": "create_folder",
+      "description": "Create a folder in the Obsidian vault",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the folder in the Obsidian vault"
+          }
+        },
+        "required": ["path"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the folder was created successfully"
+          }
+        }
+      }
+    },
+    {
+      "name": "list_files",
+      "description": "List files in a folder in the Obsidian vault",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the folder in the Obsidian vault"
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "Whether to list files recursively",
+            "default": false
+          }
+        },
+        "required": ["path"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of file paths"
+          }
+        }
+      }
+    },
+    {
+      "name": "search_vault",
+      "description": "Search for files in the Obsidian vault",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "path": {
+            "type": "string",
+            "description": "Path to search in (optional)",
+            "default": "/"
+          }
+        },
+        "required": ["query"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Path to the file"
+                },
+                "snippet": {
+                  "type": "string",
+                  "description": "Snippet of the file content containing the match"
+                }
+              }
+            },
+            "description": "Search results"
+          }
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "name": "vault_info",
+      "description": "Information about the Obsidian vault",
+      "uri": "obsidian://vault-info"
+    },
+    {
+      "name": "vault_config",
+      "description": "Configuration of the Obsidian vault",
+      "uri": "obsidian://vault-config"
+    }
+  ]
+}

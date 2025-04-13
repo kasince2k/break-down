@@ -1,0 +1,62 @@
+{
+  "test_cases": [
+    {
+      "id": "test_case_1",
+      "description": "Basic article breakdown",
+      "user_messages": [
+        "Obsidian Mode\nPlease create a breakdown for the article at path: Clippings/sample-article.md"
+      ],
+      "expected_responses": [
+        "Article breakdown complete",
+        "Created breakdown folder",
+        "Generated",
+        "Created canvas visualization"
+      ]
+    },
+    {
+      "id": "test_case_2",
+      "description": "Article breakdown with specific sections",
+      "user_messages": [
+        "Obsidian Mode\nPlease create a breakdown for the article at path: Clippings/technical-article.md with special focus on the methodology section"
+      ],
+      "expected_responses": [
+        "Article breakdown complete",
+        "Created breakdown folder",
+        "Generated",
+        "Created canvas visualization"
+      ]
+    },
+    {
+      "id": "test_case_3",
+      "description": "Missing article path",
+      "user_messages": [
+        "Obsidian Mode\nPlease create a breakdown for this article"
+      ],
+      "expected_responses": [
+        "Please provide a path"
+      ]
+    },
+    {
+      "id": "test_case_4",
+      "description": "Non-existent article path",
+      "user_messages": [
+        "Obsidian Mode\nPlease create a breakdown for the article at path: Clippings/non-existent-article.md"
+      ],
+      "expected_responses": [
+        "Could not read the article",
+        "check the path"
+      ]
+    },
+    {
+      "id": "test_case_5",
+      "description": "Without activation phrase",
+      "user_messages": [
+        "Please create a breakdown for the article at path: Clippings/sample-article.md"
+      ],
+      "expected_responses": [
+        "To activate the Obsidian Article Breakdown System",
+        "include 'Obsidian Mode'"
+      ]
+    }
+  ]
+}
