@@ -48,10 +48,12 @@ async def run_client():
     Sets up and runs the MCP client.
     """
     # --- Server Configuration ---
-    # TODO: Replace these placeholders with the actual command and arguments
-    #       to run your specific MCP server process.
-    server_command = 'echo'  # Example: 'node', sys.executable
-    server_args = ['Placeholder: MCP server started'] # Example: ['path/to/your/server.js'], ['path/to/server.py']
+    # Updated to connect to the Obsidian MCP server
+    server_command = 'node'
+    server_args = [
+        '/Users/ashwin/side_projects/obsidian-mcp/build/main.js',
+        '/Users/ashwin/personal/Obsidian/Sample/Extra/Extra/Extra/Test/Test Vault'
+    ]
     server_env = None # Optional: Dictionary of environment variables if needed
 
     server_params = StdioServerParameters(
