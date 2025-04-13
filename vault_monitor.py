@@ -1,11 +1,28 @@
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Set, Optional
+import time
+import logging
+import asyncio
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from dotenv import load_dotenv
+from python_connector.obsidian_chat import run_breakdown_for_file
+
+# --- Load .env file ---
+load_dotenv()
+# ----------------------
+
+# Configure logging (adjust level and format as needed)
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
 # --- Configuration ---
-VAULT_PATH = Path("/path/to/your/obsidian/vault")  # ! CHANGE THIS !
+VAULT_PATH = Path("/Users/ashwin/personal/Obsidian/Sample/Extra/Extra/Extra/Test/Test Vault")  # Vault Path
 STATE_DIR = Path.home() / ".obsidian_monitor_state"
 LAST_RUN_FILE = STATE_DIR / "last_run.txt"
 PROCESSED_FILES_FILE = STATE_DIR / "processed_files.json"
@@ -114,6 +131,73 @@ def find_new_markdown_files():
     _save_last_run_time(current_run_time)
     print(f"Finished check. Next check will look for files modified after: {current_run_time}")
 
+# --- New file handling logic ---
+
+# Make sure this points to the directory *containing* your Clippings folder
+# VAULT_BASE_PATH should be the path configured in .env for ObsidianChat
+VAULT_BASE_PATH = os.getenv("VAULT_PATH") # Read from .env ideally, or hardcode carefully
+CLIPPINGS_DIR_NAME = "Clippings" # Name of the folder to monitor within the vault
+
+if not VAULT_BASE_PATH:
+    logging.error("VAULT_PATH environment variable not set. Cannot determine monitoring path.")
+    exit(1)
+
+watch_path = Path(VAULT_BASE_PATH) / CLIPPINGS_DIR_NAME
+
+if not watch_path.is_dir():
+    logging.error(f"Clippings directory not found at expected path: {watch_path}")
+    exit(1)
+
+class NewFileHandler(FileSystemEventHandler):
+    """Handles file system events."""
+    def on_created(self, event):
+        """Called when a file or directory is created."""
+        if not event.is_directory and event.src_path.endswith(".md"):
+            src_path = Path(event.src_path)
+            # Check if the event is directly within the monitored Clippings folder
+            if src_path.parent == watch_path:
+                filename_without_ext = src_path.stem
+                logging.info(f"Detected new article in {CLIPPINGS_DIR_NAME}: {filename_without_ext}.md")
+
+                # Run the asynchronous breakdown process synchronously in a new event loop
+                try:
+                    # Use asyncio.run() to execute the async function from this sync thread
+                    asyncio.run(self.run_breakdown_async(filename_without_ext))
+                    # Logging moved to run_breakdown_async upon completion/failure
+                except Exception as e:
+                    # Catch potential errors from asyncio.run() itself or re-raised exceptions
+                    logging.error(f"Error running breakdown process for {filename_without_ext}: {e}")
+            else:
+                 logging.debug(f"Ignoring file created in sub-directory: {event.src_path}")
+        else:
+            logging.debug(f"Ignoring event (not .md file or is directory): {event.src_path}")
+
+    async def run_breakdown_async(self, filename_without_ext: str):
+        """Wrapper to run the breakdown and log errors."""
+        try:
+            await run_breakdown_for_file(filename_without_ext)
+            logging.info(f"Breakdown task completed for: {filename_without_ext}")
+        except Exception as e:
+            logging.error(f"Breakdown task failed for '{filename_without_ext}': {e}", exc_info=True)
 
 if __name__ == "__main__":
-    find_new_markdown_files()
+    logging.info(f"Starting Obsidian Vault Monitor for directory: {watch_path}")
+    event_handler = NewFileHandler()
+    observer = Observer()
+    observer.schedule(event_handler, str(watch_path), recursive=False) # Monitor only Clippings folder, not subdirs
+    observer.start()
+    logging.info("Monitor started. Press Ctrl+C to stop.")
+    
+    try:
+        # Keep the main thread alive
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logging.info("Stopping monitor...")
+        observer.stop()
+    except Exception as e:
+        logging.error(f"An unexpected error occurred in the monitor: {e}", exc_info=True)
+        observer.stop()
+        
+    observer.join()
+    logging.info("Monitor stopped.")
