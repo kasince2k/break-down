@@ -38,9 +38,49 @@ When executing steps related to the article breakdown workflow, follow these rul
 **4. Canvas Creation (`.canvas` file):**
    - If the step is "Create canvas '[CanvasName].canvas'...", use the `create-canvas` tool (or equivalent file creation method) to generate the file content.
    - The task may include the original article path for context.
-   - **Critical Requirements:** Generate JSON content for the `.canvas` file adhering strictly to the specified structure, coordinates, colors, and layout rules. (Refer to previous detailed JSON structure).
-   - **Node/Edge Details:** Ensure unique IDs, correct file paths, coordinates, colors, sides, etc., are used as specified previously.
-   - **Format:** Ensure valid JSON.
+   - **Critical Requirements:** Generate JSON content for the `.canvas` file adhering strictly to this structure:
+     ```json
+     {
+       "nodes": [
+         // ... node objects ...
+       ],
+       "edges": [
+         // ... edge objects ...
+       ]
+     }
+     ```
+   - **Node Details:**
+     - `id`: Must be unique for each node.
+     - `type`: Always "file".
+     - `file`: Complete path to the markdown file relative to the vault root.
+     - `width`: Set consistently to **350** (slightly wider).
+     - `height`: Proportional to content (minimum **150**, maximum **400** recommended).
+     - `color`: Use specified codes (Original: 6-purple, Summary: 4-green, L1: 3-yellow, L2: 5-cyan, L3: 1-blue, Special: 2-orange).
+     - **Coordinates (Revised Y-Levels):**
+       - Original Article Node: `y = -800`, `x = 0`
+       - Summary Node (00-Summary): `y = -400`, `x = 0`
+       - Level 1 Nodes (01-..., 02-...): `y = 0`
+       - Level 2 Nodes (0x.01-...): `y = 400`
+       - Level 3 Nodes (0x.0y.01-...): `y = 800`
+       - Special Nodes (Key-Concepts, etc.): Position horizontally centered below L1 nodes at `y = 400` (like L2).
+     - **Horizontal Positioning (X-Coordinates for nodes at same Y-level):**
+       - Calculate total width needed: `TotalWidth = (NumNodes * NodeWidth) + (NumNodes - 1) * HorizontalSpacing`
+       - Use `NodeWidth = 350`, `HorizontalSpacing = 300` (increased spacing).
+       - Calculate starting X for the group: `StartX = -(TotalWidth / 2) + (NodeWidth / 2)`
+       - Position node `i` (0-indexed) at: `X = StartX + i * (NodeWidth + HorizontalSpacing)`
+       - Apply this centering logic primarily to Level 1 nodes. Level 2/3 nodes should be positioned below their direct parent, but apply similar horizontal spacing if a parent has multiple children.
+   - **Edge Details:**
+     - `id`: Must be unique for each edge.
+     - `fromNode`, `toNode`: Use the unique `id` of the source (parent) and target (child) nodes.
+     - `fromSide`: Typically "bottom" for the parent node.
+     - `toSide`: Typically "top" for the child node.
+     - `color`: Match the target (child) node's color.
+     - Connect Original Article -> Summary.
+     - Connect Summary -> All Level 1 nodes.
+     - Connect each Level 1 node -> Its direct Level 2 children.
+     - Connect each Level 2 node -> Its direct Level 3 children.
+     - Connect relevant parent (e.g., Summary or a specific L1 node) -> Special nodes.
+   - **Format:** Ensure valid JSON with no trailing whitespace or comments.
 
 **General Execution:**
 - Use the specific tool mentioned or implied by the step (e.g., `create-directory`, `create-note`, `create-canvas`).
